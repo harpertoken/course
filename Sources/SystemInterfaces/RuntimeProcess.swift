@@ -3,12 +3,12 @@ import Core
 
 /// Represents a runtime process with lifecycle management
 public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked Sendable {
-    public enum State: CustomStringConvertible {
+    public enum State: CustomStringConvertible, Sendable {
         case idle
         case starting
         case running(pid: Int32)
         case stopped(exitCode: Int32?)
-        case failed(Error)
+        case failed(message: String)
 
         public var description: String {
             switch self {
@@ -16,7 +16,7 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
             case .starting: return "Starting"
             case .running(let pid): return "Running (PID: \(pid))"
             case .stopped(let code): return "Stopped (Code: \(code ?? -1))"
-            case .failed: return "Failed"
+            case .failed(let message): return "Failed: \(message)"
             }
         }
     }
@@ -101,7 +101,7 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
                 await handleProcessTermination()
             }
         } catch {
-            state = .failed(error)
+            state = .failed(message: error.localizedDescription)
             throw error
         }
     }
@@ -128,15 +128,15 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
         try await start()
     }
 
-    public func metrics() async -> [String: Any] {
-        var metrics: [String: Any] = [
+    public func metrics() async -> [String: String] {
+        var metrics: [String: String] = [
             "id": descriptor.id.uuidString,
             "command": descriptor.command,
             "state": String(describing: state)
         ]
 
         if case .running(let pid) = state {
-            metrics["pid"] = pid
+            metrics["pid"] = "\(pid)"
         }
 
         let (stdout, stderr) = await dataHandler.getData()

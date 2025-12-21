@@ -64,7 +64,7 @@ public class RuntimeManager: SystemService, @unchecked Sendable {
     }
 
     /// Get metrics for a specific process
-    public func metrics(for id: UUID) async -> [String: Any]? {
+    public func metrics(for id: UUID) async -> [String: String]? {
         guard let process = queue.sync(execute: { processes[id] }) else {
             return nil
         }

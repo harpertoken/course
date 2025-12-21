@@ -62,7 +62,7 @@ class SystemManagerViewModel: ObservableObject {
         }
     }
 
-    func getMetrics(for id: UUID) async -> [String: Any]? {
+    func getMetrics(for id: UUID) async -> [String: String]? {
         return await runtimeManager.metrics(for: id)
     }
 }

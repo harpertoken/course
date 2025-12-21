@@ -9,7 +9,7 @@ public protocol RuntimeControllable {
 
 /// Protocol for resources that can be observed
 public protocol ObservableResource {
-    func metrics() async -> [String: Any]
+    func metrics() async -> [String: String]
 }
 
 /// Protocol for system services
