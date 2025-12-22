@@ -19,6 +19,13 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
             case .failed(let message): return "Failed: \(message)"
             }
         }
+
+        public var canStop: Bool {
+            switch self {
+            case .running: return true
+            default: return false
+            }
+        }
     }
 
     private let descriptor: TaskDescriptor

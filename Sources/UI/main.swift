@@ -95,7 +95,7 @@ struct ContentView: View {
                     Button("Stop") {
                         viewModel.stopProcess(id: id)
                     }
-                    .disabled(true) // TODO: enable based on state
+                    .disabled(!state.canStop)
                 }
             }
 

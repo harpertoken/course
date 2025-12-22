@@ -39,9 +39,9 @@ public class Supervisor: @unchecked Sendable {
             for (id, state) in processes {
                 if case .running(let pid) = state {
                     if let taskMetrics = taskMetricsSampler.sample(pid: pid) {
-                        let metricsDict: [String: Any] = [
-                            "cpu": 0.0, // TODO: implement task CPU sampling
-                            "memory": taskMetrics.memoryResident
+                        let metricsDict: [String: String] = [
+                            "cpu": "0.0", // Future: implement task CPU percentage sampling
+                            "memory": "\(taskMetrics.memoryResident)"
                         ]
 
                         let violated = await runtimeManager.checkPolicies(for: id, with: metricsDict)
