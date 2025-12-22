@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+- Fixed all SwiftLint violations across the codebase (trailing newlines, line length limits)
+- Corrected CPU usage calculation in TaskMetricsSampler to use dynamic sampling intervals instead of a hardcoded 1-second assumption
+- Fixed thread count reporting in TaskMetricsSampler to accurately show total threads instead of suspended threads
+- Added GitHub Actions workflow for automated spell checking using codespell
+- Fixed YAML linting issues in workflow files and .swiftlint.yml for proper formatting
+- Created .codespellignore file to exclude common technical terms from spell checks
+
 ## [0.1.0] - 2025-12-22
 
 ### Major Fixes/Improvements
@@ -18,5 +27,6 @@
 - Added unit tests for core components
 - Added binary releases via GitHub Actions
 - Created Homebrew formula for easy installation
+- Improved thread count calculation in TaskMetricsSampler
 
 All fixes ensure safe, efficient, user-space system management on macOS.
