@@ -34,6 +34,20 @@ public class TaskMetricsSampler {
         systemTime += TimeInterval(taskInfo.system_time.microseconds) / 1_000_000
         let currentCPUTime = userTime + systemTime
 
+        // Get total thread count
+        var threadList: thread_act_array_t! = nil
+        var threadCountVal: mach_msg_type_number_t = 0
+        let threadResult = task_threads(port, &threadList, &threadCountVal)
+        var totalThreads: Int32 = 0
+        if threadResult == KERN_SUCCESS {
+            totalThreads = Int32(threadCountVal)
+            // Deallocate the thread list
+            if let threadList = threadList {
+                let arraySize = vm_size_t(Int(threadCountVal) * MemoryLayout<thread_act_t>.size)
+                vm_deallocate(mach_task_self_, vm_address_t(bitPattern: threadList), arraySize)
+            }
+        }
+
         let currentTimestamp = Date()
         let cpuUsage: Double
         if let previous = previousCPUTimes[pid] {
@@ -51,7 +65,7 @@ public class TaskMetricsSampler {
             cpuUsage: cpuUsage,
             memoryResident: UInt64(taskInfo.resident_size),
             memoryVirtual: UInt64(taskInfo.virtual_size),
-            threadCount: taskInfo.suspend_count
+            threadCount: totalThreads
         )
     }
 }
