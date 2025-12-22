@@ -40,7 +40,7 @@ public class Supervisor: @unchecked Sendable {
                 if case .running(let pid) = state {
                     if let taskMetrics = taskMetricsSampler.sample(pid: pid) {
                         let metricsDict: [String: String] = [
-                            "cpu": "0.0", // Future: implement task CPU percentage sampling
+                            "cpu": "\(taskMetrics.cpuUsage)",
                             "memory": "\(taskMetrics.memoryResident)"
                         ]
 

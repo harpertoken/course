@@ -3,11 +3,12 @@ import Darwin
 
 /// Samples metrics for a specific task/process
 public class TaskMetricsSampler {
-    public init() {}
+    private var previousCPUTimes: [Int32: TimeInterval] = [:]
 
     public struct TaskMetrics {
         public let pid: Int32
         public let cpuTime: TimeInterval
+        public let cpuUsage: Double // percentage
         public let memoryResident: UInt64
         public let memoryVirtual: UInt64
         public let threadCount: Int32
@@ -26,10 +27,22 @@ public class TaskMetricsSampler {
 
         guard result == KERN_SUCCESS else { return nil }
 
+        let currentCPUTime = TimeInterval(taskInfo.user_time.seconds) + TimeInterval(taskInfo.user_time.microseconds) / 1_000_000 +
+                              TimeInterval(taskInfo.system_time.seconds) + TimeInterval(taskInfo.system_time.microseconds) / 1_000_000
+
+        let cpuUsage: Double
+        if let previous = previousCPUTimes[pid] {
+            let diff = currentCPUTime - previous
+            cpuUsage = diff > 0 ? (diff / 1.0) * 100 : 0 // Simplified, assuming 1s interval
+        } else {
+            cpuUsage = 0
+        }
+        previousCPUTimes[pid] = currentCPUTime
+
         return TaskMetrics(
             pid: pid,
-            cpuTime: TimeInterval(taskInfo.user_time.seconds) + TimeInterval(taskInfo.user_time.microseconds) / 1_000_000 +
-                     TimeInterval(taskInfo.system_time.seconds) + TimeInterval(taskInfo.system_time.microseconds) / 1_000_000,
+            cpuTime: currentCPUTime,
+            cpuUsage: cpuUsage,
             memoryResident: UInt64(taskInfo.resident_size),
             memoryVirtual: UInt64(taskInfo.virtual_size),
             threadCount: taskInfo.suspend_count
