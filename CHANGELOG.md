@@ -13,5 +13,8 @@
 - Added policy enforcement with timeouts and resource limits
 - Modular architecture with Swift packages
 - Thread-safe data access in RuntimeProcess
+- Added CI workflow with GitHub Actions
+- Configured SwiftLint for code quality
+- Added unit tests for core components
 
 All fixes ensure safe, efficient, user-space system management on macOS.
