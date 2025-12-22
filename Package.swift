@@ -41,6 +41,6 @@ let package = Package(
         .testTarget(
             name: "SystemManagerTests",
             dependencies: ["Core", "SystemInterfaces", "ControlPlane"]
-        ),
+        )
     ]
 )
