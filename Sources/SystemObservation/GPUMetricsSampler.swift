@@ -11,31 +11,70 @@ public class GPUMetricsSampler {
     public init() {}
 
     public func sample() -> GPUMetrics? {
-        // Real GPU sampling using IOKit
-        // This is a basic implementation - production code may need more robust error handling
+        // Production GPU sampling using IOKit
+        // Robust implementation with proper error handling and resource management
 
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleGPUWrangler") ?? IOServiceMatching("AGPM"))
+        let serviceNames = ["AppleGPUWrangler", "AGPM", "AppleM2GPUWrangler", "AppleIntelIntegratedGraphics"]
+        var service: io_service_t = 0
 
-        guard service != 0 else {
-            return GPUMetrics(usage: 0.0, temperature: nil) // Fallback
+        for name in serviceNames {
+            if let matching = IOServiceMatching(name) {
+                service = IOServiceGetMatchingService(kIOMainPortDefault, matching)
+                if service != 0 { break }
+            }
+        }
+
+        if service == 0 {
+            // Fallback: try to get any GPU service
+            service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPCIDevice"))
+            guard service != 0 else {
+                return GPUMetrics(usage: 0.0, temperature: nil)
+            }
         }
 
         defer { IOObjectRelease(service) }
 
-        // Try to get GPU usage (this is simplified - real implementation varies by GPU)
         var usage: Double = 0.0
+        var temperature: Double? = nil
 
-        // Example: Query performance counters
-        // This is placeholder - actual implementation requires specific GPU registers
-        var properties: Unmanaged<CFMutableDictionary>?
-        let result = IORegistryEntryCreateCFProperties(service, &properties, kCFAllocatorDefault, 0)
-        if result == KERN_SUCCESS, let props = properties {
-            // Parse GPU stats from props.takeUnretainedValue()
-            // For demonstration, return mock data
-            usage = 45.0
-            props.release()
+        do {
+            var properties: Unmanaged<CFMutableDictionary>?
+            let result = IORegistryEntryCreateCFProperties(service, &properties, kCFAllocatorDefault, 0)
+
+            guard result == KERN_SUCCESS else {
+                throw GPUSamplingError.ioRegistryError(result)
+            }
+
+            guard let props = properties?.takeRetainedValue() as? [String: Any] else {
+                throw GPUSamplingError.invalidProperties
+            }
+
+            // Parse GPU usage from properties (varies by GPU model)
+            if let gpuStats = props["GPUStats"] as? [String: Any],
+               let utilization = gpuStats["Utilization"] as? Double {
+                usage = utilization
+            } else if let performance = props["PerformanceStatistics"] as? [String: Any],
+                      let gpuCoreUtilization = performance["GPU Core Utilization"] as? Double {
+                usage = gpuCoreUtilization
+            }
+
+            // Parse temperature if available
+            if let thermal = props["Thermal"] as? [String: Any],
+               let gpuTemp = thermal["GPU Temperature"] as? Double {
+                temperature = gpuTemp
+            }
+
+        } catch {
+            // Log error in production
+            print("GPU sampling error: \(error)")
+            return GPUMetrics(usage: 0.0, temperature: nil)
         }
 
-        return GPUMetrics(usage: usage, temperature: 65.0)
+        return GPUMetrics(usage: min(100.0, max(0.0, usage)), temperature: temperature)
     }
+}
+
+enum GPUSamplingError: Error {
+    case ioRegistryError(kern_return_t)
+    case invalidProperties
 }
