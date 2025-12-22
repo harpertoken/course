@@ -49,13 +49,18 @@ public class GPUMetricsSampler {
                 throw GPUSamplingError.invalidProperties
             }
 
-            // Parse GPU usage from properties (varies by GPU model)
+            // Parse GPU usage from properties (implementation varies by GPU model)
             if let gpuStats = props["GPUStats"] as? [String: Any],
                let utilization = gpuStats["Utilization"] as? Double {
                 usage = utilization
-            } else if let performance = props["PerformanceStatistics"] as? [String: Any],
-                      let gpuCoreUtilization = performance["GPU Core Utilization"] as? Double {
-                usage = gpuCoreUtilization
+            } else if let performanceStats = props["PerformanceStatistics"] as? [String: Any] {
+                // Check various possible keys for GPU utilization
+                usage = performanceStats["GPU Core Utilization"] as? Double ??
+                        performanceStats["GPU Utilization"] as? Double ??
+                        performanceStats["Utilization Percentage"] as? Double ?? 0.0
+            } else if let gpuInfo = props["GPU"] as? [String: Any],
+                      let utilization = gpuInfo["Utilization"] as? Double {
+                usage = utilization
             }
 
             // Parse temperature if available
