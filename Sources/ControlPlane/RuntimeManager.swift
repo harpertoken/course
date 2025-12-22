@@ -78,11 +78,7 @@ public class RuntimeManager: SystemService, @unchecked Sendable {
         }
         // Assuming RuntimeProcess has checkPolicies, but wait, it's in SystemInterfaces
         // Since ControlPlane depends on SystemInterfaces, ok
-        // But RuntimeProcess is in SystemInterfaces, yes.
-        // But to call, need to cast or something, but since it's private, wait no, the method is public in RuntimeProcess.
-        // But the instance is private in RuntimeManager.
-        // So, I can call process.checkPolicies(metrics)
-        // But since it's actor? No, I made it class.
+        // Check policies for the process
         return process.checkPolicies(metrics: metrics)
     }
 }
