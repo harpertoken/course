@@ -36,6 +36,11 @@ let package = Package(
         .executableTarget(
             name: "UI",
             dependencies: ["Core", "ControlPlane"]
-        )
+        ),
+        // Tests
+        .testTarget(
+            name: "SystemManagerTests",
+            dependencies: ["Core", "SystemInterfaces", "ControlPlane"]
+        ),
     ]
 )
