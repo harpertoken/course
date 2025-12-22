@@ -3,6 +3,7 @@ import Darwin
 
 /// Samples metrics for a specific task/process
 public class TaskMetricsSampler {
+    public init() {}
     private var previousCPUTimes: [Int32: TimeInterval] = [:]
 
     public struct TaskMetrics {
