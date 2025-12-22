@@ -10,10 +10,7 @@ public class GPUMetricsSampler {
 
     public init() {}
 
-    public func sample() -> GPUMetrics? {
-        // Production GPU sampling using IOKit
-        // Robust implementation with proper error handling and resource management
-
+    private func findGPUService() -> io_service_t {
         let serviceNames = ["AppleGPUWrangler", "AGPM", "AppleM2GPUWrangler", "AppleIntelIntegratedGraphics"]
         var service: io_service_t = 0
 
@@ -27,15 +24,48 @@ public class GPUMetricsSampler {
         if service == 0 {
             // Fallback: try to get any GPU service
             service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPCIDevice"))
-            guard service != 0 else {
-                return GPUMetrics(usage: 0.0, temperature: nil)
-            }
+        }
+
+        return service
+    }
+
+    private func parseGPUProperties(_ props: [String: Any]) -> (usage: Double, temperature: Double?) {
+        var usage: Double = 0.0
+        var temperature: Double?
+
+        // Parse GPU usage from properties (implementation varies by GPU model)
+        if let gpuStats = props["GPUStats"] as? [String: Any],
+           let utilization = gpuStats["Utilization"] as? Double {
+            usage = utilization
+        } else if let performanceStats = props["PerformanceStatistics"] as? [String: Any] {
+            // Check various possible keys for GPU utilization
+            usage = performanceStats["GPU Core Utilization"] as? Double ??
+                    performanceStats["GPU Utilization"] as? Double ??
+                    performanceStats["Utilization Percentage"] as? Double ?? 0.0
+        } else if let gpuInfo = props["GPU"] as? [String: Any],
+                  let utilization = gpuInfo["Utilization"] as? Double {
+            usage = utilization
+        }
+
+        // Parse temperature if available
+        if let thermal = props["Thermal"] as? [String: Any],
+           let gpuTemp = thermal["GPU Temperature"] as? Double {
+            temperature = gpuTemp
+        }
+
+        return (usage: min(100.0, max(0.0, usage)), temperature: temperature)
+    }
+
+    public func sample() -> GPUMetrics? {
+        // Production GPU sampling using IOKit
+        // Robust implementation with proper error handling and resource management
+
+        let service = findGPUService()
+        guard service != 0 else {
+            return GPUMetrics(usage: 0.0, temperature: nil)
         }
 
         defer { IOObjectRelease(service) }
-
-        var usage: Double = 0.0
-        var temperature: Double? = nil
 
         do {
             var properties: Unmanaged<CFMutableDictionary>?
@@ -49,33 +79,14 @@ public class GPUMetricsSampler {
                 throw GPUSamplingError.invalidProperties
             }
 
-            // Parse GPU usage from properties (implementation varies by GPU model)
-            if let gpuStats = props["GPUStats"] as? [String: Any],
-               let utilization = gpuStats["Utilization"] as? Double {
-                usage = utilization
-            } else if let performanceStats = props["PerformanceStatistics"] as? [String: Any] {
-                // Check various possible keys for GPU utilization
-                usage = performanceStats["GPU Core Utilization"] as? Double ??
-                        performanceStats["GPU Utilization"] as? Double ??
-                        performanceStats["Utilization Percentage"] as? Double ?? 0.0
-            } else if let gpuInfo = props["GPU"] as? [String: Any],
-                      let utilization = gpuInfo["Utilization"] as? Double {
-                usage = utilization
-            }
-
-            // Parse temperature if available
-            if let thermal = props["Thermal"] as? [String: Any],
-               let gpuTemp = thermal["GPU Temperature"] as? Double {
-                temperature = gpuTemp
-            }
+            let (usage, temperature) = parseGPUProperties(props)
+            return GPUMetrics(usage: usage, temperature: temperature)
 
         } catch {
             // Log error in production
             print("GPU sampling error: \(error)")
             return GPUMetrics(usage: 0.0, temperature: nil)
         }
-
-        return GPUMetrics(usage: min(100.0, max(0.0, usage)), temperature: temperature)
     }
 }
 
