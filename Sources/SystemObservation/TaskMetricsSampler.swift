@@ -4,7 +4,7 @@ import Darwin
 /// Samples metrics for a specific task/process
 public class TaskMetricsSampler {
     public init() {}
-    private var previousCPUTimes: [Int32: TimeInterval] = [:]
+    private var previousCPUTimes: [Int32: (cpuTime: TimeInterval, timestamp: Date)] = [:]
 
     public struct TaskMetrics {
         public let pid: Int32
@@ -34,14 +34,16 @@ public class TaskMetricsSampler {
         systemTime += TimeInterval(taskInfo.system_time.microseconds) / 1_000_000
         let currentCPUTime = userTime + systemTime
 
+        let currentTimestamp = Date()
         let cpuUsage: Double
         if let previous = previousCPUTimes[pid] {
-            let diff = currentCPUTime - previous
-            cpuUsage = diff > 0 ? (diff / 1.0) * 100 : 0 // Simplified, assuming 1s interval
+            let diffCPU = currentCPUTime - previous.cpuTime
+            let diffTime = currentTimestamp.timeIntervalSince(previous.timestamp)
+            cpuUsage = diffCPU > 0 && diffTime > 0 ? (diffCPU / diffTime) * 100 : 0
         } else {
             cpuUsage = 0
         }
-        previousCPUTimes[pid] = currentCPUTime
+        previousCPUTimes[pid] = (cpuTime: currentCPUTime, timestamp: currentTimestamp)
 
         return TaskMetrics(
             pid: pid,
