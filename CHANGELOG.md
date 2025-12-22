@@ -16,5 +16,7 @@
 - Added CI workflow with GitHub Actions
 - Configured SwiftLint for code quality
 - Added unit tests for core components
+- Added binary releases via GitHub Actions
+- Created Homebrew formula for easy installation
 
 All fixes ensure safe, efficient, user-space system management on macOS.
