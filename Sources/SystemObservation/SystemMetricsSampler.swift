@@ -84,8 +84,9 @@ public class SystemMetricsSampler {
 
         if result == KERN_SUCCESS {
             let pageSize: UInt64 = 4096 // macOS standard page size
-            let used = UInt64(vmStats.active_count + vmStats.inactive_count + vmStats.wire_count) * pageSize
-            let total = UInt64(vmStats.active_count + vmStats.inactive_count + vmStats.wire_count + vmStats.free_count) * pageSize
+            let wiredCount = vmStats.active_count + vmStats.inactive_count + vmStats.wire_count
+            let used = UInt64(wiredCount) * pageSize
+            let total = UInt64(wiredCount + vmStats.free_count) * pageSize
             return (used, total)
         } else {
             return (0, 0)

@@ -28,8 +28,11 @@ public class TaskMetricsSampler {
 
         guard result == KERN_SUCCESS else { return nil }
 
-        let currentCPUTime = TimeInterval(taskInfo.user_time.seconds) + TimeInterval(taskInfo.user_time.microseconds) / 1_000_000 +
-                              TimeInterval(taskInfo.system_time.seconds) + TimeInterval(taskInfo.system_time.microseconds) / 1_000_000
+        var userTime = TimeInterval(taskInfo.user_time.seconds)
+        userTime += TimeInterval(taskInfo.user_time.microseconds) / 1_000_000
+        var systemTime = TimeInterval(taskInfo.system_time.seconds)
+        systemTime += TimeInterval(taskInfo.system_time.microseconds) / 1_000_000
+        let currentCPUTime = userTime + systemTime
 
         let cpuUsage: Double
         if let previous = previousCPUTimes[pid] {
