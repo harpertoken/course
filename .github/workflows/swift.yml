@@ -36,11 +36,8 @@ jobs:
         cp .build/release/UI dist/
         tar -czf systemmanager-macos.tar.gz -C dist .
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
+      with:
+        files: systemmanager-macos.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./systemmanager-macos.tar.gz
-        asset_name: systemmanager-macos.tar.gz
-        asset_content_type: application/gzip
