@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2025-12-22
+
 ### Improvements
-- Fixed all SwiftLint violations across the codebase (trailing newlines, line length limits)
+- Fixed all SwiftLint violations across the codebase (trailing newlines, line length limits, cyclomatic complexity in GPUMetricsSampler)
 - Corrected CPU usage calculation in TaskMetricsSampler to use dynamic sampling intervals instead of a hardcoded 1-second assumption
 - Fixed thread count reporting in TaskMetricsSampler to accurately show total threads instead of suspended threads
 - Added GitHub Actions workflow for automated spell checking using codespell

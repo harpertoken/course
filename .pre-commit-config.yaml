@@ -1,0 +1,9 @@
+repos:
+- repo: local
+  hooks:
+  - id: swiftlint
+    name: swiftlint
+    entry: swiftlint
+    language: system
+    files: \.swift$
+    types: [swift]
