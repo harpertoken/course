@@ -1,5 +1,4 @@
 import Foundation
-import Core
 
 /// Policy rules for runtime processes
 public struct Policy {
