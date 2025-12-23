@@ -39,13 +39,22 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
     actor DataHandler {
         private var stdoutData = Data()
         private var stderrData = Data()
+        private let maxSize = 1_048_576 // 1 MB limit
 
         func append(to stream: StreamType, data: Data) {
             switch stream {
             case .stdout:
                 stdoutData.append(data)
+                if stdoutData.count > maxSize {
+                    let excess = stdoutData.count - maxSize
+                    stdoutData.removeFirst(excess)
+                }
             case .stderr:
                 stderrData.append(data)
+                if stderrData.count > maxSize {
+                    let excess = stderrData.count - maxSize
+                    stderrData.removeFirst(excess)
+                }
             }
         }
 
