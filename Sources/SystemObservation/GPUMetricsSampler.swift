@@ -11,7 +11,8 @@ public class GPUMetricsSampler {
     public init() {}
 
     private func findGPUService() -> io_service_t {
-        let serviceNames = ["AppleGPUWrangler", "AGPM", "AppleM2GPUWrangler", "AppleIntelIntegratedGraphics"]
+        let serviceNames = ["IOAccelerator", "AppleGPUWrangler", "AGPM",
+                            "AppleM2GPUWrangler", "AppleIntelIntegratedGraphics"]
         var service: io_service_t = 0
 
         for name in serviceNames {
@@ -35,11 +36,12 @@ public class GPUMetricsSampler {
 
         // Parse GPU usage from properties (implementation varies by GPU model)
         if let gpuStats = props["GPUStats"] as? [String: Any],
-           let utilization = gpuStats["Utilization"] as? Double {
+            let utilization = gpuStats["Utilization"] as? Double {
             usage = utilization
         } else if let performanceStats = props["PerformanceStatistics"] as? [String: Any] {
             // Check various possible keys for GPU utilization
-            usage = performanceStats["GPU Core Utilization"] as? Double ??
+            usage = performanceStats["Device Utilization %"] as? Double ??
+                    performanceStats["GPU Core Utilization"] as? Double ??
                     performanceStats["GPU Utilization"] as? Double ??
                     performanceStats["Utilization Percentage"] as? Double ?? 0.0
         } else if let gpuInfo = props["GPU"] as? [String: Any],
@@ -49,8 +51,10 @@ public class GPUMetricsSampler {
 
         // Parse temperature if available
         if let thermal = props["Thermal"] as? [String: Any],
-           let gpuTemp = thermal["GPU Temperature"] as? Double {
+            let gpuTemp = thermal["GPU Temperature"] as? Double {
             temperature = gpuTemp
+        } else if let temp = props["Temperature"] as? Double {
+            temperature = temp
         }
 
         return (usage: min(100.0, max(0.0, usage)), temperature: temperature)

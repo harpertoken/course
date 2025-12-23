@@ -17,6 +17,20 @@ struct SystemManager {
 
         let runtimeManager = RuntimeManager()
         let taskMetricsSampler = TaskMetricsSampler()
+        await handleCommand(
+            command: command,
+            args: args,
+            runtimeManager: runtimeManager,
+            taskMetricsSampler: taskMetricsSampler
+        )
+    }
+
+    static func handleCommand(
+        command: String,
+        args: [String],
+        runtimeManager: RuntimeManager,
+        taskMetricsSampler: TaskMetricsSampler
+    ) async {
         let supervisor = Supervisor(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
 
         // Start supervisor
@@ -48,6 +62,8 @@ struct SystemManager {
             await handleStats(idString: idString, runtimeManager: runtimeManager)
         case "daemon":
             await handleDaemon(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
+        case "gpu":
+            await handleGpu()
         default:
             print("Unknown command: \(command)")
             printUsage()
@@ -67,6 +83,7 @@ struct SystemManager {
           stop <id>            Stop process by ID
           stats <id>           Show stats for process by ID
           daemon               Start daemon mode for background monitoring
+          gpu                  Show GPU usage and temperature
 
         JSON config example: {"command": "/bin/echo", "arguments": ["hello"]}
         """)
@@ -134,6 +151,20 @@ struct SystemManager {
         // Keep running
         while true {
             try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+        }
+    }
+
+    static func handleGpu() async {
+        let sampler = GPUMetricsSampler()
+        if let metrics = sampler.sample() {
+            print("GPU Usage: \(metrics.usage)%")
+            if let temp = metrics.temperature {
+                print("GPU Temperature: \(temp)°C")
+            } else {
+                print("GPU Temperature: Not available")
+            }
+        } else {
+            print("Failed to sample GPU metrics")
         }
     }
 }
