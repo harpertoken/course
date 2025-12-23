@@ -25,4 +25,12 @@ final class SystemManagerTests: XCTestCase {
         let processes = await manager.list()
         XCTAssertTrue(processes.isEmpty)
     }
+
+    func testDataHandlerBufferLimit() async {
+        let handler = RuntimeProcess.DataHandler()
+        let largeData = Data(repeating: 0, count: 2_000_000) // 2MB
+        await handler.append(to: .stdout, data: largeData)
+        let result = await handler.getData()
+        XCTAssertEqual(result.stdout.count, 1_048_576) // Should be truncated to 1MB
+    }
 }

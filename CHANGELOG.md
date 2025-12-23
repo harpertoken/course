@@ -5,6 +5,10 @@
 ## [0.1.1] - 2025-12-22
 
 ### Improvements
+- Added 1MB buffer size limit to DataHandler in RuntimeProcess to prevent unbounded memory growth for verbose processes
+- Added unit test for DataHandler buffer limit functionality
+
+### Improvements
 - Fixed all SwiftLint violations across the codebase (trailing newlines, line length limits, cyclomatic complexity in GPUMetricsSampler)
 - Corrected CPU usage calculation in TaskMetricsSampler to use dynamic sampling intervals instead of a hardcoded 1-second assumption
 - Fixed thread count reporting in TaskMetricsSampler to accurately show total threads instead of suspended threads
