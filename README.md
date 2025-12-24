@@ -7,14 +7,14 @@ User-space system manager for macOS (Apple Silicon) using Swift. Orchestrates pr
 Refactored to actor-based data handling in RuntimeProcess. Data mutations now isolated in DataHandler actor, eliminating Sendable warnings and ensuring thread safety.
 
 ```swift
-actor DataHandler {
+public actor DataHandler {
     private var stdoutData = Data()
     private var stderrData = Data()
-    private let maxSize = 1_048_576 // 1 MB limit
+    static let maxSize = 1_048_576 // 1 MB limit
 
     private func truncateIfNeeded(_ data: inout Data) {
-        if data.count > maxSize {
-            data = data.suffix(maxSize)
+        if data.count > Self.maxSize {
+            data = data.suffix(Self.maxSize)
         }
     }
 
