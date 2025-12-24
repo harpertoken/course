@@ -27,25 +27,25 @@ final class SystemManagerTests: XCTestCase {
     }
 
     func testDataHandlerBufferLimit() async {
-        let maxSize = 1_048_576 // 1 MB limit
         let largeDataSize = 2_000_000 // 2 MB
         let chunkSize = 500_000 // 0.5 MB chunks
+        let handler = RuntimeProcess.DataHandler()
 
         // Test stdout with single large append
-        let handler = RuntimeProcess.DataHandler()
         let largeData = Data(repeating: 0, count: largeDataSize)
         await handler.append(to: .stdout, data: largeData)
         var result = await handler.getData()
-        XCTAssertEqual(result.stdout.count, maxSize)
+        XCTAssertEqual(result.stdout.count, RuntimeProcess.DataHandler.maxSize)
+        XCTAssertEqual(result.stderr.count, 0, "Stderr should be empty after stdout append")
 
-        // Test stderr with incremental appends
-        let newHandler = RuntimeProcess.DataHandler()
+        // Test stderr with incremental appends on the same handler
         for _ in 0..<5 {
             let chunk = Data(repeating: 1, count: chunkSize)
-            await newHandler.append(to: .stderr, data: chunk)
+            await handler.append(to: .stderr, data: chunk)
         }
         // 5 * 500k = 2.5MB, should be truncated to 1MB
-        result = await newHandler.getData()
-        XCTAssertEqual(result.stderr.count, maxSize)
+        result = await handler.getData()
+        XCTAssertEqual(result.stdout.count, RuntimeProcess.DataHandler.maxSize, "Stdout data should remain unaffected")
+        XCTAssertEqual(result.stderr.count, RuntimeProcess.DataHandler.maxSize)
     }
 }
