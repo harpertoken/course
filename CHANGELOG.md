@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
 ## [0.1.1] - 2025-12-22
 
 ### Improvements
@@ -15,6 +13,18 @@
 - Added GitHub Actions workflow for automated spell checking using codespell
 - Fixed YAML linting issues in workflow files and .swiftlint.yml for proper formatting
 - Created .codespellignore file to exclude common technical terms from spell checks
+
+### Performance Improvements
+- Optimized DataHandler buffer truncation using `suffix(maxSize)` instead of `removeFirst(excess)` for better performance (O(1) vs O(n)) when handling large data buffers
+
+### Code Quality
+- Refactored DataHandler truncation logic into a `truncateIfNeeded` helper method to eliminate code duplication between stdout and stderr handling
+
+### Testing
+- Enhanced `testDataHandlerBufferLimit` to comprehensively test both stdout and stderr streams, including incremental data appends and using named constants for maintainability
+
+### Documentation
+- Updated README code snippet to reflect the current actor-based DataHandler implementation with efficient truncation
 
 ## [0.1.0] - 2025-12-22
 
