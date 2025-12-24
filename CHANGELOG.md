@@ -23,6 +23,9 @@
 ### Testing
 - Enhanced `testDataHandlerBufferLimit` to comprehensively test both stdout and stderr streams, including incremental data appends and using named constants for maintainability
 
+### Code Quality
+- Exposed DataHandler.maxSize as public static to eliminate test duplication and improve maintainability
+
 ### Documentation
 - Updated README code snippet to reflect the current actor-based DataHandler implementation with efficient truncation
 
