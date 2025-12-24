@@ -12,20 +12,20 @@ actor DataHandler {
     private var stderrData = Data()
     private let maxSize = 1_048_576 // 1 MB limit
 
+    private func truncateIfNeeded(_ data: inout Data) {
+        if data.count > maxSize {
+            data = data.suffix(maxSize)
+        }
+    }
+
     func append(to stream: StreamType, data: Data) {
         switch stream {
         case .stdout:
             stdoutData.append(data)
-            if stdoutData.count > maxSize {
-                let excess = stdoutData.count - maxSize
-                stdoutData.removeFirst(excess)
-            }
+            truncateIfNeeded(&stdoutData)
         case .stderr:
             stderrData.append(data)
-            if stderrData.count > maxSize {
-                let excess = stderrData.count - maxSize
-                stderrData.removeFirst(excess)
-            }
+            truncateIfNeeded(&stderrData)
         }
     }
 
