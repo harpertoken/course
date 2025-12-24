@@ -36,14 +36,14 @@ public class RuntimeProcess: RuntimeControllable, ObservableResource, @unchecked
     private var state: State = .idle
     private let dataHandler = DataHandler()
 
-    actor DataHandler {
+    public actor DataHandler {
         private var stdoutData = Data()
         private var stderrData = Data()
-        private let maxSize = 1_048_576 // 1 MB limit
+        static let maxSize = 1_048_576 // 1 MB limit
 
         private func truncateIfNeeded(_ data: inout Data) {
-            if data.count > maxSize {
-                data = data.suffix(maxSize)
+            if data.count > Self.maxSize {
+                data = data.suffix(Self.maxSize)
             }
         }
 
