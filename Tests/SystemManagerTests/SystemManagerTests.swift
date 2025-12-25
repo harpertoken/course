@@ -72,8 +72,9 @@ final class SystemManagerTests: XCTestCase {
         let detector = try? AnomalyDetector(modelPath: "/invalid/path")
         XCTAssertNil(detector, "Should return nil for invalid model path")
 
-        // If anomalib is available (in CI), test with dummy model
-        // Note: This assumes anomalib installed; otherwise skipped
-        // For full integration, train a model first
+        // Integration test: If anomalib is available (in CI), verify import works
+        // Note: Full prediction test requires trained model, which is complex for CI
+        // Manual testing: Train model with scripts/train_dummy_model.py, then test detection
+        // For now, initialization test ensures no crashes
     }
 }
