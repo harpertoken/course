@@ -1,5 +1,6 @@
 import Foundation
 import Darwin
+import PythonKit
 
 /// Samples system-wide CPU and memory metrics
 public class SystemMetricsSampler {
@@ -8,26 +9,36 @@ public class SystemMetricsSampler {
         public let memoryUsage: UInt64 // bytes used
         public let memoryTotal: UInt64 // bytes total
         public let timestamp: Date
+        public let anomalyScore: Double?
     }
 
     private var previousCPUInfo: host_cpu_load_info?
+    private var anomalyDetector: AnomalyDetector?
 
-    public init() {}
+    public init(modelPath: String? = nil) {
+        if let path = modelPath {
+            anomalyDetector = try? AnomalyDetector(modelPath: path)
+        }
+    }
 
     public func sample() -> Metrics? {
         let timestamp = Date()
 
         // CPU
-        let cpuUsage = sampleCPU()
+        let cpuUsage = sampleCPU() ?? 0
 
         // Memory
         let memoryInfo = sampleMemory()
 
+        // Anomaly detection
+        let anomalyScore: Double? = anomalyDetector?.detectAnomaly(metrics: [cpuUsage, Double(memoryInfo.used)])
+
         return Metrics(
-            cpuUsage: cpuUsage ?? 0,
+            cpuUsage: cpuUsage,
             memoryUsage: memoryInfo.used,
             memoryTotal: memoryInfo.total,
-            timestamp: timestamp
+            timestamp: timestamp,
+            anomalyScore: anomalyScore
         )
     }
 

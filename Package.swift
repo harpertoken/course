@@ -6,6 +6,9 @@ import PackageDescription
 let package = Package(
     name: "SystemManager",
     platforms: [.macOS(.v14)],
+    dependencies: [
+        .package(url: "https://github.com/pvieito/PythonKit.git", from: "0.5.0")
+    ],
     targets: [
         // Core protocols and types
         .target(
@@ -20,7 +23,7 @@ let package = Package(
         // Observation layer
         .target(
             name: "SystemObservation",
-            dependencies: ["Core", "SystemInterfaces"]
+            dependencies: ["Core", "SystemInterfaces", "PythonKit"]
         ),
         // Control plane
         .target(
@@ -40,7 +43,7 @@ let package = Package(
         // Tests
         .testTarget(
             name: "SystemManagerTests",
-            dependencies: ["Core", "SystemInterfaces", "ControlPlane"]
+            dependencies: ["Core", "SystemInterfaces", "ControlPlane", "SystemObservation"]
         )
     ]
 )
