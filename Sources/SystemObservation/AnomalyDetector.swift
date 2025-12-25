@@ -19,21 +19,24 @@ public class AnomalyDetector {
     /// - Returns: Anomaly score (higher means more anomalous), nil on error
     public func detectAnomaly(metrics: [Double]) -> Double? {
         do {
-            // Convert Swift array to Python list
-            let pyMetrics = Python.list(metrics)
+            // Import numpy for array conversion
+            let np = Python.import("numpy")
 
-            // Use anomalib's inference pipeline (example with Inferencer)
-            // Actual implementation depends on model; this is a placeholder
+            // Convert metrics to numpy array and reshape for image-like input
+            // Anomalib expects image data; reshape [cpu, mem] to 1x2x1 "image"
+            let pyMetrics = np.array(metrics).reshape([1, 2, 1])
+
+            // Use anomalib's inference pipeline
+            // Note: Assumes model trained on similar reshaped data
             let inferencer = anomalib.deploy.OpenVINOInferencer(
-                path: modelPath,  // Assuming modelPath is stored
+                path: modelPath,
                 device: "CPU"
             )
             let result = inferencer.predict(pyMetrics)
 
-            // Extract anomaly score (adjust based on actual output)
+            // Extract anomaly score
             return Double(result["anomaly_score"])
         } catch {
-            // Log error or handle
             print("Anomaly detection failed: \(error)")
             return nil
         }
