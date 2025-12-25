@@ -3,6 +3,7 @@
 import Foundation
 import Darwin
 import PythonKit
+import os.log
 
 /// Samples system-wide CPU and memory metrics
 public class SystemMetricsSampler {
@@ -22,7 +23,7 @@ public class SystemMetricsSampler {
             do {
                 anomalyDetector = try AnomalyDetector(modelPath: path)
             } catch {
-                print("Warning: Failed to initialize AnomalyDetector. Anomaly detection will be disabled. Error: \(error)")
+                os_log(.error, "Failed to initialize AnomalyDetector: %{public}@", String(describing: error))
             }
         }
     }

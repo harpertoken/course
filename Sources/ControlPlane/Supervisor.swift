@@ -4,6 +4,7 @@ import Foundation
 import Core
 import SystemInterfaces
 import SystemObservation
+import os.log
 
 /// Supervisor that monitors and enforces policies on runtime processes
 public class Supervisor: @unchecked Sendable {
@@ -65,7 +66,7 @@ public class Supervisor: @unchecked Sendable {
 
             // Check system metrics for anomalies
             if let metrics = systemMetricsSampler.sample(), let score = metrics.anomalyScore, score > anomalyThreshold {
-                print("Anomaly detected in system metrics: \(score)")
+                os_log(.warning, "Anomaly detected in system metrics: %{public}f", score)
             }
         }
     }
