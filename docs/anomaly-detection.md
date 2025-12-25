@@ -48,14 +48,18 @@ for _ in 0..<1000 {  // Collect 1000 samples
 
 ### 3. Train the Model
 
-Activate the virtual environment and train:
+Anomalib is designed for image data, so raw metrics must be preprocessed into image format (e.g., reshape [cpu, mem] into 1x2x1 arrays).
+
+For custom time-series data, implement a custom data loader or convert data to images.
+
+Example with folder of preprocessed images:
 
 ```bash
 source anomalib_env/bin/activate
-anomalib train --model padim --data_path normal_metrics.csv --output_path ./anomaly_model
+anomalib train --model padim --data folder --data_path /path/to/image/folder --output ./anomaly_model
 ```
 
-Replace `padim` with a suitable model for time series (e.g., `dfm` or custom).
+Replace `padim` with suitable model. For time-series, consider custom model or data transformation.
 
 For synthetic data generation, run:
 
