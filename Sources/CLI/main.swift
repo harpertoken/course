@@ -1,4 +1,6 @@
 import Foundation
+// SPDX-License-Identifier: MIT
+
 import Core
 import ControlPlane
 import SystemObservation

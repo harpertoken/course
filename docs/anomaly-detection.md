@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MIT -->
+
 # Anomaly Detection Integration
 
 This document describes the integration of anomalib for anomaly detection in system metrics within the SystemManager.
