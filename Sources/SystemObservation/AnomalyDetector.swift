@@ -6,12 +6,18 @@ import PythonKit
 /// Anomaly detector using anomalib via PythonKit
 public class AnomalyDetector {
     private let anomalib: PythonObject
-    private let modelPath: String
+    private let inferencer: PythonObject
 
     public init(modelPath: String) throws {
         self.modelPath = modelPath
         // Import anomalib
         anomalib = try Python.attemptImport("anomalib")
+
+        // Initialize inferencer once for performance
+        inferencer = anomalib.deploy.OpenVINOInferencer(
+            path: modelPath,
+            device: "CPU"
+        )
     }
 
     /// Detects anomaly in system metrics
@@ -26,12 +32,7 @@ public class AnomalyDetector {
             // Anomalib expects image data; reshape [cpu, mem] to 1x2x1 "image"
             let pyMetrics = np.array(metrics).reshape([1, 2, 1])
 
-            // Use anomalib's inference pipeline
-            // Note: Assumes model trained on similar reshaped data
-            let inferencer = anomalib.deploy.OpenVINOInferencer(
-                path: modelPath,
-                device: "CPU"
-            )
+            // Use the pre-initialized inferencer for performance
             let result = inferencer.predict(pyMetrics)
 
             // Extract anomaly score
