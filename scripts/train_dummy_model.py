@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 #!/usr/bin/env python3
 """
 Script to generate a dummy anomalib model for SystemManager anomaly detection.
