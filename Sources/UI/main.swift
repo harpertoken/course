@@ -22,10 +22,15 @@ class SystemManagerViewModel: ObservableObject {
 
     private let runtimeManager = RuntimeManager()
     private let taskMetricsSampler = TaskMetricsSampler()
+    private let systemMetricsSampler = SystemMetricsSampler()
     private var supervisor: Supervisor?
 
     init() {
-        supervisor = Supervisor(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
+        supervisor = Supervisor(
+            runtimeManager: runtimeManager,
+            taskMetricsSampler: taskMetricsSampler,
+            systemMetricsSampler: systemMetricsSampler
+        )
         supervisor?.start()
         loadProcesses()
     }

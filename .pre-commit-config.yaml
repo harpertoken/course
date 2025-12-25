@@ -7,3 +7,9 @@ repos:
     language: system
     files: \.swift$
     types: [swift]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.8.0
+  hooks:
+  - id: ruff
+    args: [--fix]
+  - id: ruff-format

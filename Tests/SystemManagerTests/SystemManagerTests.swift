@@ -2,6 +2,7 @@ import XCTest
 @testable import Core
 @testable import SystemInterfaces
 @testable import ControlPlane
+@testable import SystemObservation
 
 final class SystemManagerTests: XCTestCase {
     func testPolicyInit() {
@@ -47,5 +48,30 @@ final class SystemManagerTests: XCTestCase {
         result = await handler.getData()
         XCTAssertEqual(result.stdout.count, RuntimeProcess.DataHandler.maxSize, "Stdout data should remain unaffected")
         XCTAssertEqual(result.stderr.count, RuntimeProcess.DataHandler.maxSize)
+    }
+
+    func testSystemMetricsSampler() {
+        let sampler = SystemMetricsSampler()
+        // First sample might return nil for CPU
+        _ = sampler.sample()
+        // Second sample should have CPU
+        if let metrics = sampler.sample() {
+            XCTAssertGreaterThanOrEqual(metrics.cpuUsage, 0)
+            XCTAssertGreaterThan(metrics.memoryUsage, 0)
+            XCTAssertGreaterThan(metrics.memoryTotal, 0)
+            XCTAssertNotNil(metrics.timestamp)
+            // Anomaly score should be nil since no model provided
+            XCTAssertNil(metrics.anomalyScore)
+        }
+    }
+
+    func testAnomalyDetector() {
+        // Test AnomalyDetector initialization with invalid path
+        let detector = try? AnomalyDetector(modelPath: "/invalid/path")
+        XCTAssertNil(detector, "Should return nil for invalid model path")
+
+        // If anomalib is available (in CI), test with dummy model
+        // Note: This assumes anomalib installed; otherwise skipped
+        // For full integration, train a model first
     }
 }

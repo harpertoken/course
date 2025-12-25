@@ -17,11 +17,13 @@ struct SystemManager {
 
         let runtimeManager = RuntimeManager()
         let taskMetricsSampler = TaskMetricsSampler()
+        let systemMetricsSampler = SystemMetricsSampler()
         await handleCommand(
             command: command,
             args: args,
             runtimeManager: runtimeManager,
-            taskMetricsSampler: taskMetricsSampler
+            taskMetricsSampler: taskMetricsSampler,
+            systemMetricsSampler: systemMetricsSampler
         )
     }
 
@@ -29,9 +31,14 @@ struct SystemManager {
         command: String,
         args: [String],
         runtimeManager: RuntimeManager,
-        taskMetricsSampler: TaskMetricsSampler
+        taskMetricsSampler: TaskMetricsSampler,
+        systemMetricsSampler: SystemMetricsSampler
     ) async {
-        let supervisor = Supervisor(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
+        let supervisor = Supervisor(
+            runtimeManager: runtimeManager,
+            taskMetricsSampler: taskMetricsSampler,
+            systemMetricsSampler: systemMetricsSampler
+        )
 
         // Start supervisor
         supervisor.start()
@@ -61,7 +68,11 @@ struct SystemManager {
             let idString = args[2]
             await handleStats(idString: idString, runtimeManager: runtimeManager)
         case "daemon":
-            await handleDaemon(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
+            await handleDaemon(
+                runtimeManager: runtimeManager,
+                taskMetricsSampler: taskMetricsSampler,
+                systemMetricsSampler: systemMetricsSampler
+            )
         case "gpu":
             await handleGpu()
         default:
@@ -144,8 +155,16 @@ struct SystemManager {
         }
     }
 
-    static func handleDaemon(runtimeManager: RuntimeManager, taskMetricsSampler: TaskMetricsSampler) async {
-        let supervisor = Supervisor(runtimeManager: runtimeManager, taskMetricsSampler: taskMetricsSampler)
+    static func handleDaemon(
+        runtimeManager: RuntimeManager,
+        taskMetricsSampler: TaskMetricsSampler,
+        systemMetricsSampler: SystemMetricsSampler
+    ) async {
+        let supervisor = Supervisor(
+            runtimeManager: runtimeManager,
+            taskMetricsSampler: taskMetricsSampler,
+            systemMetricsSampler: systemMetricsSampler
+        )
         supervisor.start()
         print("Daemon started. Press Ctrl+C to stop.")
         // Keep running

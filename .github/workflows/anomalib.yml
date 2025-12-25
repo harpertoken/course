@@ -1,0 +1,31 @@
+---
+name: Anomalib Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  anomalib-setup:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install . ruff
+    - name: Lint Python
+      run: ruff check . && ruff format --check .
+    - name: Verify Anomalib
+      run: python -c "import anomalib; print('Anomalib installed successfully')"
+    - name: Build Swift
+      run: swift build
+    - name: Run Tests
+      run: swift test
