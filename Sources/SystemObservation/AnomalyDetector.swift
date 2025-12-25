@@ -11,11 +11,12 @@ public class AnomalyDetector {
     public init(modelPath: String) throws {
         // Import anomalib
         anomalib = try Python.attemptImport("anomalib")
+        let models = anomalib.models
 
-        // Load the pre-trained model
-        // Assuming the model is saved in anomalib format
-        // This is a simplified example; actual loading depends on anomalib API
-        model = anomalib.load_model(modelPath)
+        // Load the pre-trained model (example with Padim)
+        // Actual loading depends on model type; adjust for your trained model
+        let padim = models.Padim
+        model = padim.load_from_checkpoint(modelPath)
     }
 
     /// Detects anomaly in system metrics
