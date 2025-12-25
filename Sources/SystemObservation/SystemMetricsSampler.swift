@@ -19,7 +19,11 @@ public class SystemMetricsSampler {
 
     public init(modelPath: String? = nil) {
         if let path = modelPath {
-            anomalyDetector = try? AnomalyDetector(modelPath: path)
+            do {
+                anomalyDetector = try AnomalyDetector(modelPath: path)
+            } catch {
+                print("Warning: Failed to initialize AnomalyDetector. Anomaly detection will be disabled. Error: \(error)")
+            }
         }
     }
 
