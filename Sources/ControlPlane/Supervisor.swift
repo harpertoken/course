@@ -66,7 +66,7 @@ public class Supervisor: @unchecked Sendable {
 
             // Check system metrics for anomalies
             if let metrics = systemMetricsSampler.sample(), let score = metrics.anomalyScore, score > anomalyThreshold {
-                os_log(.warning, "Anomaly detected in system metrics: %{public}f", score)
+                os_log("Anomaly detected in system metrics: %{public}f", log: .default, type: .default, score)
             }
         }
     }

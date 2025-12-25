@@ -23,7 +23,7 @@ public class SystemMetricsSampler {
             do {
                 anomalyDetector = try AnomalyDetector(modelPath: path)
             } catch {
-                os_log(.error, "Failed to initialize AnomalyDetector: %{public}@", String(describing: error))
+                os_log("Failed to initialize AnomalyDetector: %{public}@", log: .default, type: .error, String(describing: error))
             }
         }
     }
