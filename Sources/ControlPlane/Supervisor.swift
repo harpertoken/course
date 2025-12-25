@@ -10,17 +10,20 @@ public class Supervisor: @unchecked Sendable {
     private let runtimeManager: RuntimeManager
     private let taskMetricsSampler: TaskMetricsSampler
     private let systemMetricsSampler: SystemMetricsSampler
+    private let anomalyThreshold: Double
     private var isRunning = false
     private let queue = DispatchQueue(label: "Supervisor.queue")
 
     public init(
         runtimeManager: RuntimeManager,
         taskMetricsSampler: TaskMetricsSampler,
-        systemMetricsSampler: SystemMetricsSampler
+        systemMetricsSampler: SystemMetricsSampler,
+        anomalyThreshold: Double = 0.5
     ) {
         self.runtimeManager = runtimeManager
         self.taskMetricsSampler = taskMetricsSampler
         self.systemMetricsSampler = systemMetricsSampler
+        self.anomalyThreshold = anomalyThreshold
     }
 
     /// Start the supervisor loop
@@ -61,7 +64,7 @@ public class Supervisor: @unchecked Sendable {
             }
 
             // Check system metrics for anomalies
-            if let metrics = systemMetricsSampler.sample(), let score = metrics.anomalyScore, score > 0.5 {
+            if let metrics = systemMetricsSampler.sample(), let score = metrics.anomalyScore, score > anomalyThreshold {
                 print("Anomaly detected in system metrics: \(score)")
             }
         }
