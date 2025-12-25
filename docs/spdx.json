@@ -1,0 +1,41 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "documentName": "systemmanager-sbom",
+  "documentNamespace": "https://github.com/harpertoken/course/spdx/systemmanager/1.0",
+  "creationInfo": {
+    "creators": ["Organization: harpertoken"],
+    "created": "2025-12-26T00:00:00Z"
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-SystemManager",
+      "name": "SystemManager",
+      "versionInfo": "1.0.0",
+      "supplier": "Organization: harpertoken",
+      "downloadLocation": "git+https://github.com/harpertoken/course.git",
+      "licenseDeclared": "MIT",
+      "licenseConcluded": "MIT",
+      "copyrightText": "Copyright (c) 2025 harpertoken"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-PythonKit",
+      "name": "PythonKit",
+      "versionInfo": "0.5.1",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "https://github.com/pvieito/PythonKit.git",
+      "licenseDeclared": "MIT",
+      "licenseConcluded": "MIT"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-Anomalib",
+      "name": "anomalib",
+      "versionInfo": "2.2.0",
+      "supplier": "NOASSERTION",
+      "downloadLocation": "https://pypi.org/project/anomalib/",
+      "licenseDeclared": "Apache-2.0",
+      "licenseConcluded": "Apache-2.0"
+    }
+  ]
+}
