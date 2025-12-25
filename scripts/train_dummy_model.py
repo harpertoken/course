@@ -17,8 +17,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def generate_synthetic_data(num_samples=1000):
-    """Generate synthetic normal system metrics data."""
+def generate_dummy_data_manifest(num_samples=1000):
+    """Generate dummy data manifest for anomalib (file paths for image data)."""
     np.random.seed(42)
 
     # Create DataFrame with 'image' column for anomalib
@@ -35,8 +35,8 @@ def generate_synthetic_data(num_samples=1000):
 
 if __name__ == "__main__":
     # Generate synthetic data
-    logger.info("Generating synthetic normal data...")
-    data = generate_synthetic_data()
+    logger.info("Generating dummy data manifest...")
+    data = generate_dummy_data_manifest()
     data_path = "synthetic_normal_data.csv"
     data.to_csv(data_path, index=False)
 
