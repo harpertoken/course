@@ -10,7 +10,6 @@ public class AnomalyDetector {
     private let inferencer: PythonObject
 
     public init(modelPath: String) throws {
-        self.modelPath = modelPath
         // Import anomalib
         anomalib = try Python.attemptImport("anomalib")
 
@@ -25,22 +24,17 @@ public class AnomalyDetector {
     /// - Parameter metrics: Array of metric values (e.g., [cpuUsage, memoryUsage])
     /// - Returns: Anomaly score (higher means more anomalous), nil on error
     public func detectAnomaly(metrics: [Double]) -> Double? {
-        do {
-            // Import numpy for array conversion
-            let np = Python.import("numpy")
+        // Import numpy for array conversion
+        let np = Python.import("numpy")
 
-            // Convert metrics to numpy array and reshape for image-like input
-            // Anomalib expects image data; reshape [cpu, mem] to 1x2x1 "image"
-            let pyMetrics = np.array(metrics).reshape([1, 2, 1])
+        // Convert metrics to numpy array and reshape for image-like input
+        // Anomalib expects image data; reshape [cpu, mem] to 1x2x1 "image"
+        let pyMetrics = np.array(metrics).reshape([1, 2, 1])
 
-            // Use the pre-initialized inferencer for performance
-            let result = inferencer.predict(pyMetrics)
+        // Use the pre-initialized inferencer for performance
+        let result = inferencer.predict(pyMetrics)
 
-            // Extract anomaly score
-            return Double(result["anomaly_score"])
-        } catch {
-            os_log(.error, "Anomaly detection failed: %{public}@", String(describing: error))
-            return nil
-        }
+        // Extract anomaly score (may return nil if key missing)
+        return Double(result["anomaly_score"])
     }
 }
