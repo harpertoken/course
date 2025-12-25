@@ -12,7 +12,7 @@
     {
       "SPDXID": "SPDXRef-Package-SystemManager",
       "name": "SystemManager",
-      "versionInfo": "1.0.0",
+      "versionInfo": "0.2.0",
       "supplier": "Organization: harpertoken",
       "downloadLocation": "git+https://github.com/harpertoken/course.git",
       "licenseDeclared": "MIT",
