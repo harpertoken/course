@@ -2,6 +2,7 @@
 
 import Foundation
 import PythonKit
+import os.log
 
 /// Anomaly detector using anomalib via PythonKit
 public class AnomalyDetector {
@@ -38,7 +39,7 @@ public class AnomalyDetector {
             // Extract anomaly score
             return Double(result["anomaly_score"])
         } catch {
-            print("Anomaly detection failed: \(error)")
+            os_log(.error, "Anomaly detection failed: %{public}@", String(describing: error))
             return nil
         }
     }
